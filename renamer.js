@@ -24,7 +24,7 @@ if (!process.argv[2]) {
 
                             var finalName = dt + '_' + time + '_' + filename;
 
-                            fs.rename(filename, finalName, function() {
+                            fs.rename(process.argv[2] + '/' + filename, process.argv[2] + '/' + finalName, function() {
                                 console.log('renamed: ' + filename + ' to ' + finalName);
                             });
                         }
