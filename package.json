@@ -4,7 +4,6 @@
   "description": "A dumb way of renaming image files by their create date.",
   "main": "renamer.js",
   "dependencies": {
-    "async": "^0.9.0",
     "crc": "^3.2.1",
     "each": "~0.4.9",
     "exif": "~0.4.0"
