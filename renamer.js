@@ -12,18 +12,20 @@ if (!process.argv[3]) {
   var errorCount = 0;
   var successCount = 0;
 
-  fs.readdir(process.argv[2], function (err, files) {
+  console.log('Starting the transfer...');
+  fs.readdir(sourceDir, function (err, files) {
     each(files)
       .on('item', function (filename, index, next) {
         if (filename.match(/\.jpg$/gi) && !filename.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{4}/i)) {
-          console.log('Attempting ' + process.argv[2] + '/' + filename);
           //try {
           new ExifImage({
-            image: process.argv[2] + '/' + filename
+            image: sourceDir + filename
           }, function (error, exifData) {
             if (error) {
               logFile.write(new Date() + ' - [EXIF Error]: ' + filename + ' - ' + error);
-              console.log('Error: ' + error.message);
+              console.log('[EXIF Error]: ' + error.message);
+              errorCount++;
+              next();
             }
             else {
               var orig = exifData.exif.CreateDate;
@@ -64,17 +66,20 @@ if (!process.argv[3]) {
             }
           });
           //} catch (error) {
-          //  console.log('Error: ' + error.message);
+          //  console.log('[Crazy Error]: ' + error.message);
           //}
+        }
+        else {
+          next();
         }
       })
       .on('error', function (err) {
         logFile.write(new Date() + ' - [Each Error]: ' + err);
-        console.log(err);
+        console.log('[Each Error]: ' + err);
       })
       .on('end', function () {
         logFile.end();
-        console.log('Rename completed.\n------------------------');
+        console.log('\nRename completed.\n------------------------');
         console.log('Source: ' + sourceDir);
         console.log('Destination: ' + destinationDir);
         console.log('Files renamed: ' + successCount);
