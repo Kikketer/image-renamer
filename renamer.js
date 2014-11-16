@@ -11,6 +11,7 @@ if (!process.argv[3]) {
   var logFile = fs.createWriteStream(destinationDir + 'transfer.log');
   var errorCount = 0;
   var successCount = 0;
+
   fs.readdir(process.argv[2], function (err, files) {
     each(files)
       .on('item', function (filename, index, next) {

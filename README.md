@@ -22,4 +22,11 @@ Any CRC failures will be logged to the `transfer.log` file.
 ###TODO
 Allow "try again" type logic with the failed files, using the transfer log.
 
+###Attribution
+Most of the hard work was done by someone more talented than myself:
+
+- EXIF: https://github.com/gomfunkel/node-exif
+- Each: http://www.adaltas.com/projects/node-each/
+- CRC: https://github.com/alexgorbatchev/node-crc
+
 Feel free to use this for your own use... and REFUSE to pay for a product that does exactly this.
