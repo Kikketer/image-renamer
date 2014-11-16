@@ -1,116 +1,127 @@
-var fs = require('fs');
-var ExifImage = require('exif').ExifImage;
 var each = require('each');
+var ExifImage = require('exif').ExifImage;
+var fs = require('fs');
 var crc = require('crc');
-var async = require('async');
 
-if (!process.argv[3]) {
-  console.log('Usage: node renamer.js [source folder] [destination folder name]');
-} else {
-  var sourceDir = process.argv[2].match(/\/$/) ? process.argv[2] : process.argv[2] + '/';
-  var destinationDir = process.argv[3].match(/\/$/) ? process.argv[3] : process.argv[3] + '/';
-  //var logFile = fs.createWriteStream(destinationDir + 'error.log');
-  var errorCount = 0;
-  var successCount = 0;
+var sourceDir;
+var destinationDir;
+var errorCount = 0;
+var successCount = 0;
+var badExifCount = 0;
+var totalJpg = 0;
+var errorFile;
 
-  console.log('Starting the transfer...');
-  fs.readdir(sourceDir, function (err, files) {
-    async.each(files, function (filename, callback) {
-        //each(files)
-        //  .on('item', function (filename, index, next) {
-        if (filename.match(/\.jpg$/gi) && !filename.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{4}/i)) {
-          //try {
-            new ExifImage({
-              image: sourceDir + filename
-            }, function (error, exifData) {
-              if (error) {
-                //logFile.write(new Date() + ' - [EXIF Error]: ' + filename + ' - ' + error);
-                console.log('[EXIF Error]: ' + error.message);
-                errorCount++;
-                //callback();
-                //next();
-              }
-              else {
-                var orig = exifData.exif.CreateDate;
-                var dt = orig.split(' ')[0];
-                var time = orig.split(' ')[1];
-                dt = dt.replace(/:/g, '-');
-                time = time.substr(0, time.length - 3);
-                time = time.replace(/:/g, '');
-
-                var finalName = dt + '_' + time + '_' + filename;
-
-                // First get the CRC of the file before we move it
-                var thisFileCRC = crc.crc32(fs.readFileSync(sourceDir + filename)).toString(16);
-
-                // Setup the reader and writer streams
-                var readf = fs.createReadStream(sourceDir + filename);
-                var writef = fs.createWriteStream(destinationDir + finalName);
-
-                // When the piping is finished, do some logic.
-                readf.on('end', function () {
-                  var newCrc = crc.crc32(fs.readFileSync(destinationDir + finalName)).toString(16);
-                  // Check to see if they match, if not delete and report
-                  if (thisFileCRC !== newCrc) {
-                    //logFile.write(new Date() + ' - [CRC Mismatch]: ' + sourceDir + filename);
-                    errorCount++;
-                  }
-                  else {
-                    successCount++;
-                    console.log(filename + ' -> ' + finalName);
-                  }
-
-                  // Make this synchronous... just to keep our head straight
-                  //next();
-                  //callback();
-                });
-
-                // Actually copy over the file via fancy Node piping
-                readf.pipe(writef);
-                //callback();
-              }
-            });
-          //} catch (error) {
-          //  console.log('[Crazy Error]: ' + error.message);
-          //}
-        }
-        else {
-          //next();
-          //callback();
-        }
-        callback();
-      },
-      function (err) {
-        console.log('done?');
-        if (err) {
-          //logFile.write(new Date() + ' - [Each Error]: ' + err);
-          console.log('[Each Error]: ' + err);
-        }
-        else {
-          console.log('\nRename completed.\n------------------------');
-          console.log('Source: ' + sourceDir);
-          console.log('Destination: ' + destinationDir);
-          //console.log('Files renamed: ' + successCount);
-          //console.log('ERRORS: ' + errorCount + '\n------------------------');
-          console.log('------------------------');
-          //logFile.end();
-        }
+var rename = function () {
+  each()
+    .files(sourceDir + '*.jpg')
+    .files(sourceDir + '*.JPG')
+    //.parallel(2)
+    .on('item', function (filename, next) {
+      console.log('----------\nFile: ', filename);
+      totalJpg++;
+      // ./sourcefault/2014-10-11_2345_DESC_1234.JPG
+      if (filename.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{4}_[a-z,_,1-9]*\.jpg$/gi)) {
+        console.log('Already properly named, just copying');
+        var newFilename = destinationDir + filename.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{4}_[a-z,_,1-9]*\.jpg$/gi)[0];
+        copyFile(filename, newFilename, function() {
+          console.log('Processing complete...');
+          next();
+        });
+      }
+      else {
+        getFilename(filename, function (newFilename) {
+          if (!newFilename) {
+            next();
+            return;
+          }
+          copyFile(filename, newFilename, function () {
+            console.log('Processing complete...');
+            next();
+          });
+        });
+      }
+    })
+    .on('error', function (err, errors) {
+      console.log(err.message);
+      errors.forEach(function (error) {
+        console.log('  ' + error.message);
       });
-    //.on('error', function (err) {
-    //  logFile.write(new Date() + ' - [Each Error]: ' + err);
-    //  console.log('[Each Error]: ' + err);
-    //})
-    //.on('end', function () {
-    //  logFile.end();
-    //  console.log('\nRename completed.\n------------------------');
-    //  console.log('Source: ' + sourceDir);
-    //  console.log('Destination: ' + destinationDir);
-    //  console.log('Files renamed: ' + successCount);
-    //  console.log('ERRORS: ' + errorCount + '\n------------------------');
-    //});
-  });
-}
-
-var processFile = function (filename) {
-
+    })
+    .on('end', function () {
+      errorFile.end(new Date() + ' - Complete');
+      console.log('\n=============');
+      console.log('COMPLETE');
+      console.log('Total JPGs: ' + totalJpg);
+      console.log('Success: ' + successCount);
+      console.log('Copy Error: ' + errorCount);
+      console.log('Bad EXIF: ' + badExifCount);
+      console.log('=============');
+    });
 };
+
+var getFilename = function (filename, callback) {
+  new ExifImage({
+    image: filename
+  }, function (error, exifData) {
+    if (error || !exifData || !exifData.exif || !exifData.exif.CreateDate) {
+      errorFile.write(new Date() + ' - [Bad Exif]: ' + filename + '\n');
+      console.log('Bad exif..');
+      badExifCount++;
+      callback();
+      return;
+    }
+
+    var actualFilename = filename.match(/[a-z,0-9,_,\-,.]*$/gi)[0];
+    var orig = exifData.exif.CreateDate;
+    var dt = orig.split(' ')[0];
+    var time = orig.split(' ')[1];
+    dt = dt.replace(/:/g, '-');
+    time = time.substr(0, time.length - 3);
+    time = time.replace(/:/g, '');
+
+    var finalName = destinationDir + dt + '_' + time + '_' + actualFilename;
+
+    console.log(filename + ' -> ' + finalName);
+
+    callback(finalName);
+  });
+};
+
+var copyFile = function (original, newname, callback) {
+  // First get the CRC of the file before we move it
+  var thisFileCRC = crc.crc32(fs.readFileSync(original)).toString(16);
+
+  // Setup the reader and writer streams
+  var readf = fs.createReadStream(original);
+  var writef = fs.createWriteStream(newname);
+
+  // When the piping is finished, do some logic.
+  readf.on('end', function () {
+    var newCrc = crc.crc32(fs.readFileSync(newname)).toString(16);
+    // Check to see if they match, if not delete and report
+    if (thisFileCRC !== newCrc) {
+      errorFile.write(new Date() + ' - [CRC Mismatch]: ' + filename + '\n');
+      console.log('[CRC Mismatch]: ' + original);
+      errorCount++;
+    }
+    else {
+      successCount++;
+    }
+
+    callback();
+  });
+
+  // Actually copy over the file via fancy Node piping
+  readf.pipe(writef);
+};
+
+// Check and go
+if (!process.argv[3]) {
+  console.log('Usage: node renamer.js [source folder] [destination folder]');
+} else {
+  sourceDir = process.argv[2].match(/\/$/) ? process.argv[2] : process.argv[2] + '/';
+  destinationDir = process.argv[3].match(/\/$/) ? process.argv[3] : process.argv[3] + '/';
+  errorFile = fs.createWriteStream(destinationDir + 'error.log');
+  errorFile.write(new Date() + ' - Started\n');
+  rename();
+}
