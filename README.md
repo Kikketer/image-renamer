@@ -20,7 +20,8 @@ YYYY-MM-DD_HHmm_<original filename>.jpg
 Any CRC failures will be logged to the `transfer.log` file.
 
 ###TODO
-Allow "try again" type logic with the failed files, using the transfer log.
+- Allow "try again" type logic with the failed files, using the transfer log.
+- Wrap this baby up into a native app (node-webkit or the like)
 
 ###Attribution
 Most of the hard work was done by someone more talented than myself:

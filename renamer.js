@@ -8,7 +8,7 @@ if (!process.argv[3]) {
 } else {
   var sourceDir = process.argv[2].match(/\/$/) ? process.argv[2] : process.argv[2] + '/';
   var destinationDir = process.argv[3].match(/\/$/) ? process.argv[3] : process.argv[3] + '/';
-  var logFile = fs.createWriteStream(destinationDir + 'transfer.log');
+  var logFile = fs.createWriteStream(destinationDir + 'error.log');
   var errorCount = 0;
   var successCount = 0;
 
@@ -48,6 +48,7 @@ if (!process.argv[3]) {
                   }
                   else {
                     successCount++;
+                    console.log(filename + ' -> ' + finalName);
                   }
 
                   // Make this synchronous... just to keep our head straight
@@ -63,6 +64,7 @@ if (!process.argv[3]) {
         }
       })
       .on('error', function (err) {
+        logFile.write(new Date() + ' - [Each Error]: ' + err);
         console.log(err);
       })
       .on('end', function() {
