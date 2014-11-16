@@ -35,10 +35,11 @@ if (!process.argv[3]) {
                 // First get the CRC of the file before we move it
                 var thisFileCRC = crc.crc32(fs.readFileSync(sourceDir + filename)).toString(16);
 
-                // Now copy the file to the /tmp directory
+                // Setup the reader and writer streams
                 var readf = fs.createReadStream(sourceDir + filename);
                 var writef = fs.createWriteStream(destinationDir + finalName);
 
+                // When the piping is finished, do some logic.
                 readf.on('end', function () {
                   var newCrc = crc.crc32(fs.readFileSync(destinationDir + finalName)).toString(16);
                   // Check to see if they match, if not delete and report
@@ -55,6 +56,7 @@ if (!process.argv[3]) {
                   next();
                 });
 
+                // Actually copy over the file via fancy Node piping
                 readf.pipe(writef);
               }
             });
