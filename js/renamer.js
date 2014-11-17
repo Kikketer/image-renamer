@@ -11,7 +11,10 @@ var badExifCount = 0;
 var totalJpg = 0;
 var errorFile;
 
-var rename = function () {
+var rename = function (source, destination) {
+  sourceDir = source;
+  destinationDir = destination;
+
   each()
     .files(sourceDir + '*.jpg')
     .files(sourceDir + '*.JPG')
@@ -116,12 +119,13 @@ var copyFile = function (original, newname, callback) {
 };
 
 // Check and go
-if (!process.argv[3]) {
-  console.log('Usage: node renamer.js [source folder] [destination folder]');
-} else {
-  sourceDir = process.argv[2].match(/\/$/) ? process.argv[2] : process.argv[2] + '/';
-  destinationDir = process.argv[3].match(/\/$/) ? process.argv[3] : process.argv[3] + '/';
-  errorFile = fs.createWriteStream(destinationDir + 'error.log');
-  errorFile.write(new Date() + ' - Started\n');
-  rename();
-}
+//if (!process.argv[3]) {
+//  console.log('Usage: node renamer.js [source folder] [destination folder]');
+//} else {
+//  sourceDir = process.argv[2].match(/\/$/) ? process.argv[2] : process.argv[2] + '/';
+//  destinationDir = process.argv[3].match(/\/$/) ? process.argv[3] : process.argv[3] + '/';
+//  errorFile = fs.createWriteStream(destinationDir + 'error.log');
+//  errorFile.write(new Date() + ' - Started\n');
+//  rename();
+//}
+exports.rename = rename;

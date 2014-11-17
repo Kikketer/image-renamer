@@ -2,7 +2,10 @@
   "name": "imagenamer",
   "version": "0.0.1",
   "description": "A dumb way of renaming image files by their create date.",
-  "main": "renamer.js",
+  "main": "index.html",
+  "window": {
+    "toolbar": true
+  },
   "dependencies": {
     "crc": "^3.2.1",
     "each": "~0.4.9",
