@@ -3,14 +3,9 @@
  */
 
 var f = function() {
-  var open = function() {
-    console.log('opening');
-    if(document.getElementById('visibleDestination')) {
-      document.write('yay');
-    }
-  };
-
-  this.open = open;
+  this.giggity = function() {
+    console.log('giggity');
+  }
 };
 
 module.exports = new f();

@@ -11,9 +11,29 @@ var badExifCount = 0;
 var totalJpg = 0;
 var errorFile;
 
+var getRenamableFileCount = function(source, callback) {
+  fs.readdir(source, function(err, files) {
+    var total = 0;
+    each(files)
+      .on('item', function(file, next) {
+        //if(file.find(/\.jpg$/i)) {
+        console.log(file);
+          total++;
+        //}
+        next();
+      })
+      .on('end', function() {
+        callback(total);
+      });
+  });
+};
+
 var rename = function (source, destination) {
-  sourceDir = source;
-  destinationDir = destination;
+  sourceDir = source.match(/\/$/) ? source : source + '/';
+  destinationDir = destination.match(/\/$/) ? destination : destination + '/';
+
+  errorFile = fs.createWriteStream(sourceDir + 'error.log');
+  errorFile.write(new Date() + ' - Started\n');
 
   each()
     .files(sourceDir + '*.jpg')
@@ -26,7 +46,7 @@ var rename = function (source, destination) {
       if (filename.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{4}_[a-z,_,1-9]*\.jpg$/gi)) {
         console.log('Already properly named, just copying');
         var newFilename = destinationDir + filename.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{4}_[a-z,_,1-9]*\.jpg$/gi)[0];
-        copyFile(filename, newFilename, function() {
+        copyFile(filename, newFilename, function () {
           console.log('Processing complete...');
           next();
         });
@@ -129,3 +149,4 @@ var copyFile = function (original, newname, callback) {
 //  rename();
 //}
 exports.rename = rename;
+exports.getFileCount = getRenamableFileCount;
