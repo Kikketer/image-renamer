@@ -11,24 +11,23 @@ var badExifCount = 0;
 var totalJpg = 0;
 var errorFile;
 
-var getRenamableFileCount = function(source, callback) {
-  fs.readdir(source, function(err, files) {
-    var total = 0;
+var getRenamableFiles = function (source, callback) {
+  fs.readdir(source, function (err, files) {
+    var validFiles = [];
     each(files)
-      .on('item', function(file, next) {
-        //if(file.find(/\.jpg$/i)) {
-        console.log(file);
-          total++;
-        //}
+      .on('item', function (file, next) {
+        if (file.match(/\.jpg$/i)) {
+          validFiles.push(file);
+        }
         next();
       })
-      .on('end', function() {
-        callback(total);
+      .on('end', function () {
+        callback(validFiles);
       });
   });
 };
 
-var rename = function (source, destination) {
+var rename = function (source, destination, eachCallback, completeCallback) {
   sourceDir = source.match(/\/$/) ? source : source + '/';
   destinationDir = destination.match(/\/$/) ? destination : destination + '/';
 
@@ -47,17 +46,21 @@ var rename = function (source, destination) {
         console.log('Already properly named, just copying');
         var newFilename = destinationDir + filename.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{4}_[a-z,_,1-9]*\.jpg$/gi)[0];
         copyFile(filename, newFilename, function () {
+          eachCallback();
           console.log('Processing complete...');
           next();
         });
       }
       else {
-        getFilename(filename, function (newFilename) {
-          if (!newFilename) {
+        getFilename(filename, function (err, newFilename) {
+          if (err) {
+            eachCallback(err, filename);
             next();
             return;
           }
-          copyFile(filename, newFilename, function () {
+
+          copyFile(filename, newFilename, function (err) {
+            eachCallback(err);
             console.log('Processing complete...');
             next();
           });
@@ -71,6 +74,7 @@ var rename = function (source, destination) {
       });
     })
     .on('end', function () {
+      completeCallback(null, sourceDir + 'error.log');
       errorFile.end(new Date() + ' - Complete');
       console.log('\n=============');
       console.log('COMPLETE');
@@ -90,7 +94,7 @@ var getFilename = function (filename, callback) {
       errorFile.write(new Date() + ' - [Bad Exif]: ' + filename + '\n');
       console.log('Bad exif..');
       badExifCount++;
-      callback();
+      callback('Bad Exif');
       return;
     }
 
@@ -106,7 +110,7 @@ var getFilename = function (filename, callback) {
 
     console.log(filename + ' -> ' + finalName);
 
-    callback(finalName);
+    callback(null, finalName);
   });
 };
 
@@ -126,12 +130,12 @@ var copyFile = function (original, newname, callback) {
       errorFile.write(new Date() + ' - [CRC Mismatch]: ' + filename + '\n');
       console.log('[CRC Mismatch]: ' + original);
       errorCount++;
+      callback('Copy Failure');
     }
     else {
       successCount++;
+      callback();
     }
-
-    callback();
   });
 
   // Actually copy over the file via fancy Node piping
@@ -149,4 +153,4 @@ var copyFile = function (original, newname, callback) {
 //  rename();
 //}
 exports.rename = rename;
-exports.getFileCount = getRenamableFileCount;
+exports.getFiles = getRenamableFiles;

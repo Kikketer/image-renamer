@@ -4,7 +4,7 @@
   "description": "A dumb way of renaming image files by their create date.",
   "main": "index.html",
   "window": {
-    "toolbar": true
+    "toolbar": false
   },
   "dependencies": {
     "crc": "^3.2.1",

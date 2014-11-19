@@ -1,15 +1,9 @@
 image-renamer
 =============
 
-A pretty static and dumb image renaming script.  It's really just a NodeJS learning tool for me and attempting to smooth image renaming over for my wife.
-
-This simple script is meant to pull images from an SD card and place them into a sync'ed folder (say Google Drive or OneDrive) with their name set to the date the file was created.
-
-The application takes two parameters, the source directory and destination directory:
-
-```
-node renamer.js source destination
-```
+An image renamer application using Node-Webkit.  It's basically a simple application I built for my wife when she
+needs to rename and copy pictures from her SD card to our OneDrive folder.  Of course this can generally be used
+to rename and copy files anywhere.
 
 All jpg files in the source will be CRC'd and piped to the destination renamed like the following:
 
@@ -17,15 +11,15 @@ All jpg files in the source will be CRC'd and piped to the destination renamed l
 YYYY-MM-DD_HHmm_<original filename>.jpg
 ```
 
-Any CRC failures will be logged to the `transfer.log` file.
+Any errors will be logged to the `error.log` file in the source directory.
 
 ###TODO
 - Allow "try again" type logic with the failed files, using the transfer log.
-- Wrap this baby up into a native app (node-webkit or the like)
 
 ###Attribution
 Most of the hard work was done by someone more talented than myself:
 
+- Node-Webkit: https://github.com/rogerwang/node-webkit
 - EXIF: https://github.com/gomfunkel/node-exif
 - Each: http://www.adaltas.com/projects/node-each/
 - CRC: https://github.com/alexgorbatchev/node-crc
