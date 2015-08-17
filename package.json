@@ -1,20 +1,69 @@
 {
-  "name": "imagenamer",
-  "version": "0.0.1",
-  "description": "A dumb way of renaming image files by their create date.",
-  "main": "index.html",
-  "window": {
-    "toolbar": false
-  },
-  "dependencies": {
-    "crc": "^3.2.1",
-    "each": "~0.4.9",
-    "exif": "~0.4.0"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Chris Weed (chris@cjweed.com)",
-  "license": "BSD-2-Clause"
+    "app_name": "image-renamer", 
+    "nodejs": true, 
+    "additional_trust_anchors": "", 
+    "inject-js-end": "", 
+    "node-remote": "", 
+    "keywords": [], 
+    "devDependencies": {}, 
+    "author": "Chris Weed (chris@cjweed.com)", 
+    "user-agent": "", 
+    "window": {
+        "fullscreen": false, 
+        "kiosk_emulation": false, 
+        "resizable": false, 
+        "show": true, 
+        "always-on-top": false, 
+        "frame": true, 
+        "title": "Image Renamer", 
+        "kiosk": false, 
+        "height": 480, 
+        "exe_icon": "", 
+        "visible": true, 
+        "transparent": false, 
+        "as_desktop": false, 
+        "position": "", 
+        "show_in_taskbar": true, 
+        "mac_icon": "camera.png", 
+        "width": 640, 
+        "toolbar": false, 
+        "icon": ""
+    }, 
+    "version": "0.0.1", 
+    "inject-js-start": "", 
+    "main": "index.html", 
+    "chromium-args": "", 
+    "webexe_settings": {
+        "linux-x32": false, 
+        "export_dir": "/Users/family/Documents/Development/image-renamer/dist", 
+        "windows-x64": false, 
+        "download_dir": "/Applications/Web2Executable.app/Contents/Resources/files/downloads", 
+        "nw_compression_level": 0, 
+        "mac-x32": false, 
+        "windows-x32": false, 
+        "mac-x64": true, 
+        "nw_version": "0.12.1", 
+        "force_download": false, 
+        "linux-x64": false
+    }, 
+    "description": "A dumb way of renaming image files by their create date.", 
+    "dependencies": {
+        "crc": "^3.2.1", 
+        "exif": "~0.4.0", 
+        "each": "~0.4.9"
+    }, 
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    }, 
+    "webkit": {
+        "page-cache": false, 
+        "java": false, 
+        "plugin": false
+    }, 
+    "js-flags": "", 
+    "name": "imagenamer", 
+    "license": "BSD-2-Clause", 
+    "single-instance": true, 
+    "snapshot": "", 
+    "node-main": ""
 }

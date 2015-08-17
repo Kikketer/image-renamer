@@ -1,5 +1,5 @@
 /**
- * Created by family on 11/16/14.
+ * Created by Chris Weed on 11/16/14.
  */
 
 var renamer = require('./js/renamer.js');
@@ -71,6 +71,8 @@ $(function () {
     }
     else {
       $($('.loader-segment.default')[0]).removeClass('default').addClass('bg-success');
+      // Since it's happy lets move it
+
     }
   };
 

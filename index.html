@@ -16,7 +16,7 @@
 
     <div class="form-group">
         <label for="visibleSource">Souce Directory</label>
-        <input type="text" class="form-control" id="visibleSource" value="/Volumes/NIKON D5100/DCIM/100D5100" /> <!-- value="/Volumes/NIKON D5100/DCIM/100D5100"/> -->
+        <input type="text" class="form-control" id="visibleSource" value="/Volumes/NIKON D5100/DCIM/100D5100"/> <!-- value="/Volumes/NIKON D5100/DCIM/100D5100"/> -->
         <input id="source" type="file" style="display: none" nwdirectory
                nwworkingdir="/Volumes/NIKON D5100/DCIM/100D5100"/>
 
@@ -24,13 +24,17 @@
     </div>
     <div class="form-group">
         <label for="visibleDestination">Destination Directory</label>
-        <input type="text" class="form-control" id="visibleDestination" value="/Users/family/Pictures/OneDrive" placeholder="/Users/family/Pictures/OneDrive" /> <!--  -->
+        <input type="text" class="form-control" id="visibleDestination" value="/Users/family/Pictures/OneDrive" placeholder="/Users/family/Pictures/OneDrive"/> <!--  -->
         <input id="destination" type="file" style="display: none" nwdirectory
                nwworkingdir="/Users/family/Pictures/OneDrive"/>
 
         <p class="help-block">Select the destination directory (OneDrive)</p>
     </div>
+
     <button class="btn btn-primary" id="rename">Rename!</button>
+    <!--<label>-->
+        <!--<input type="checkbox" id="deleteChk"> Delete when complete?-->
+    <!--</label>-->
 </div>
 </body>
 </html>

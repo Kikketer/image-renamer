@@ -94,7 +94,8 @@ var getFilename = function (filename, callback) {
       errorFile.write(new Date() + ' - [Bad Exif]: ' + filename + '\n');
       console.log('Bad exif..');
       badExifCount++;
-      callback('Bad Exif');
+      getModifiedFilename(filename, callback);
+      //callback('Bad Exif');
       return;
     }
 
@@ -107,6 +108,30 @@ var getFilename = function (filename, callback) {
     time = time.replace(/:/g, '');
 
     var finalName = destinationDir + dt + '_' + time + '_' + actualFilename;
+
+    console.log(filename + ' -> ' + finalName);
+
+    callback(null, finalName);
+  });
+};
+
+// this is used if the exif is bad
+var getModifiedFilename = function(filename, callback) {
+  fs.stat(filename, function(err, stats) {
+
+    if(err) {
+      callback('Bad Modified Date');
+    }
+
+    var actualFilename = filename.match(/[a-z,0-9,_,\-,.]*$/gi)[0];
+    var orig = stats.mtime;
+    var dt = new Date(orig);
+    var month = dt.getMonth() + 1 < 10 ? '0' + dt.getMonth() : '' + dt.getMonth();
+    var day = dt.getDate() < 10 ? '0' + dt.getDate() : '' + dt.getDate();
+    var hours = dt.getHours() < 10 ? '0' + dt.getHours() : '' + dt.getHours();
+    var minutes = dt.getMinutes() < 10 ? '0' + dt.getMinutes() : '' + dt.getMinutes();
+
+    var finalName = destinationDir + dt.getFullYear() + '-' + month + '-' + day + '_' + hours + minutes + '_' + actualFilename;
 
     console.log(filename + ' -> ' + finalName);
 
@@ -140,6 +165,13 @@ var copyFile = function (original, newname, callback) {
 
   // Actually copy over the file via fancy Node piping
   readf.pipe(writef);
+};
+
+var deleteFile = function(filename, callback) {
+  callback = callback || function() {};
+
+  //fs.rename(filename)
+
 };
 
 // Check and go
