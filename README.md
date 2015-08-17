@@ -5,6 +5,8 @@ An image renamer application using Node-Webkit.  It's basically a simple applica
 needs to rename and copy pictures from her SD card to our OneDrive folder.  Of course this can generally be used
 to rename and copy files anywhere.
 
+New: If an EXIF is bad, just rename using the modifed date.
+
 All jpg files in the source will be CRC'd and piped to the destination renamed like the following:
 
 ```
